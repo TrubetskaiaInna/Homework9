@@ -9,7 +9,9 @@ const initialState = {
   userName: '',
   email: '',
   password: '',
+  passwordError: '',
   confirmPassword: '',
+  confirmPasswordError: '',
   region: '',
   sex: {
     man: false,
@@ -29,6 +31,19 @@ class FormComponent extends Component {
     this.fileInput = React.createRef()
   }
 
+  isValidPassword = () => {
+    if (this.state.password.length <= 10) {
+      this.setState({ passwordError: 'Password must contain at least 10 characters' })
+    } else {this.setState({ passwordError: '' })}
+  }
+
+  isValidConfPassword = () => {
+    if (this.state.password !== this.state.confirmPassword){
+      this.setState({ confirmPasswordError: 'Password does not match'})
+    }
+    else (this.setState({ confirmPasswordError: ''}))
+  }
+
   isValidForm = () => {
     if (this.state.firstName && this.state.lastName && this.state.userName && this.state.email
       && this.state.password && this.state.confirmPassword && this.state.region && (this.state.sex.woman
@@ -45,6 +60,26 @@ class FormComponent extends Component {
       [name]: e.target.value
     }, () => {
       this.isValidForm()
+    })
+  }
+
+  onLabelChangePassword = (e) => {
+    const name = e.target.name
+    this.setState({
+      [name]: e.target.value
+    }, () => {
+      this.isValidForm()
+      this.isValidPassword()
+    })
+  }
+
+  onLabelChangeConfPassword = (e) => {
+    const name = e.target.name
+    this.setState({
+      [name]: e.target.value
+    }, () => {
+      this.isValidForm()
+      this.isValidConfPassword()
     })
   }
 
@@ -77,7 +112,6 @@ class FormComponent extends Component {
     shownModalWindow = !shownModalWindow
     let myData = {
       firstName: this.state.firstName,
-      error: this.state.firstNameError,
       lastName: this.state.lastName,
       userName: this.state.userName,
       email: this.state.email,
@@ -109,7 +143,7 @@ class FormComponent extends Component {
                 name="firstName"
                 className='inputFirstName'
                 type="text"
-                pattern='[A-Za-zА-Яа-яЁё]'
+                // pattern='^[a-zA-Z]+$'
                 value={this.state.firstName}
                 onChange={this.onLabelChange}
                 placeholder='Enter first name'/>
@@ -150,8 +184,11 @@ class FormComponent extends Component {
               <input className='inputPassword'
                      type="password"
                      name="password"
-                     onChange={this.onLabelChange}
+                     onChange={this.onLabelChangePassword}
                      placeholder='Enter password'/>
+              <div className='wrapperError'>
+                <p>{this.state.passwordError}</p>
+              </div>
             </div>
 
             <div className='confirmPassword'>
@@ -160,8 +197,11 @@ class FormComponent extends Component {
                 name="confirmPassword"
                 className='inputConfirmPassword'
                 type="password"
-                onChange={this.onLabelChange}
+                onChange={this.onLabelChangeConfPassword}
                 placeholder='Enter password'/>
+              <div className='wrapperError'>
+                <p>{this.state.confirmPasswordError}</p>
+              </div>
             </div>
 
             <div className='region'>
