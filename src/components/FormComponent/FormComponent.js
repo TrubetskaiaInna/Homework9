@@ -21,6 +21,7 @@ const initialState = {
   emailPermission: false,
   additionalInfo: '',
   disabled: true,
+  fotoFile: '',
 }
 
 let shownModalWindow = false
@@ -53,7 +54,7 @@ class FormComponent extends Component {
   isValidForm = () => {
     if (this.state.firstName && this.state.lastName && this.state.userName && this.state.email
       && this.state.password && this.state.confirmPassword && this.state.region && (this.state.sex.woman
-        || this.state.sex.man)) {
+        || this.state.sex.man) && !this.state.emailError && !this.state.passwordError && !this.state.confirmPasswordError) {
       this.setState({ disabled: false })
     } else {
       this.setState({ disabled: true })
@@ -123,6 +124,12 @@ class FormComponent extends Component {
     })
   }
 
+  handleOnFileChange = (event) => {
+    console.log(event.target.files[0])
+    let file = event.target.files[0]
+    this.setState({ fotoFile: file })
+  }
+
   onSubmit = (e) => {
     e.preventDefault()
     shownModalWindow = !shownModalWindow
@@ -137,13 +144,14 @@ class FormComponent extends Component {
       sex: this.state.sex,
       emailPermission: this.state.emailPermission,
       additionalInfo: this.state.additionalInfo,
-      fotoFile: null,
+      fotoFile: '',
     }
     if (this.fileInput.current && this.fileInput.current.files[0]) {
       myData.fotoFile = this.fileInput.current.files[0]
     }
     console.log(myData)
     this.setState(initialState)
+    this.fileInput.current.value = null
   }
 
   render () {
@@ -170,6 +178,7 @@ class FormComponent extends Component {
               <input
                 name="lastName"
                 className='inputLastName'
+                value={this.state.lastName}
                 type="text"
                 onChange={this.onLabelChange}
                 placeholder='Enter last name'/>
@@ -180,6 +189,7 @@ class FormComponent extends Component {
               <input
                 name="userName"
                 className='inputUserName'
+                value={this.state.userName}
                 type="text"
                 onChange={this.onLabelChange}
                 placeholder='Enter user name'/>
@@ -190,6 +200,7 @@ class FormComponent extends Component {
               <input
                 name="email"
                 className='inputEmail'
+                value={this.state.email}
                 type="text"
                 onChange={this.onLabelChangeEmail}
                 placeholder='Enter email'/>
@@ -202,6 +213,7 @@ class FormComponent extends Component {
               <span> <span className='important'> * </span> Password: </span>
               <input className='inputPassword'
                      type="password"
+                     value={this.state.password}
                      name="password"
                      onChange={this.onLabelChangePassword}
                      placeholder='Enter password'/>
@@ -213,6 +225,7 @@ class FormComponent extends Component {
             <div className='confirmPassword'>
               <span> <span className='important'> * </span>Confirm password: </span>
               <input
+                value={this.state.confirmPassword}
                 name="confirmPassword"
                 className='inputConfirmPassword'
                 type="password"
@@ -226,6 +239,7 @@ class FormComponent extends Component {
             <div className='region'>
               <span> <span className='important'> * </span>Region selector:</span>
               <select
+                value={this.state.region}
                 name='region'
                 className='select'
                 onChange={this.onLabelChange}>
@@ -256,14 +270,17 @@ class FormComponent extends Component {
             <div className='emails'>
               <span>Send me promotional emails:</span>
               <input
+                value={this.state.emailPermission}
+                checked={this.state.emailPermission}
                 name='emailPermission'
                 type="checkbox"
-                onClick={this.handleCheckbox}/>
+                onChange={this.handleCheckbox}/>
             </div>
 
             <div className='info'>
               <span>Additional info:</span>
               <textarea
+                value={this.state.additionalInfo}
                 name='additionalInfo'
                 onChange={this.onLabelChange}
                 className='inputInfo'></textarea>
@@ -271,7 +288,7 @@ class FormComponent extends Component {
 
             <div className='foto'>
               <span> Upload foto:</span>
-              <input type="file" ref={this.fileInput}/>
+              <input onChange={this.handleOnFileChange} type="file" ref={this.fileInput}/>
             </div>
           </label>
 
