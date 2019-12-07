@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './FormComponent.sass'
-
+import SimpleSnackbar from '../MessageComponent/MessageComponent'
 
 const initialState = {
   firstName: '',
@@ -19,6 +19,8 @@ const initialState = {
   additionalInfo: '',
   disabled: true,
 }
+
+let shownModalWindow = false
 
 class FormComponent extends Component {
   constructor (props) {
@@ -72,6 +74,7 @@ class FormComponent extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
+    shownModalWindow = !shownModalWindow
     let myData = {
       firstName: this.state.firstName,
       error: this.state.firstNameError,
@@ -93,23 +96,25 @@ class FormComponent extends Component {
     this.setState(initialState)
   }
 
-
   render () {
     return (
       <div className='wrapperForm'>
         <form
           onSubmit={this.onSubmit}>
           <label>
+
             <div className='firstName'>
               <span> <span className='important'> * </span> First name: </span>
               <input
                 name="firstName"
                 className='inputFirstName'
                 type="text"
+                pattern='[A-Za-zА-Яа-яЁё]'
                 value={this.state.firstName}
                 onChange={this.onLabelChange}
                 placeholder='Enter first name'/>
             </div>
+
             <div className='lastName'>
               <span> <span className='important'> * </span>Last name:</span>
               <input
@@ -119,6 +124,7 @@ class FormComponent extends Component {
                 onChange={this.onLabelChange}
                 placeholder='Enter last name'/>
             </div>
+
             <div className='userName'>
               <span> <span className='important'> * </span>User name:</span>
               <input
@@ -128,6 +134,7 @@ class FormComponent extends Component {
                 onChange={this.onLabelChange}
                 placeholder='Enter user name'/>
             </div>
+
             <div className='email'>
               <span> <span className='important'> * </span> Email: </span>
               <input
@@ -137,6 +144,7 @@ class FormComponent extends Component {
                 onChange={this.onLabelChange}
                 placeholder='Enter email'/>
             </div>
+
             <div className='password'>
               <span> <span className='important'> * </span> Password: </span>
               <input className='inputPassword'
@@ -145,6 +153,7 @@ class FormComponent extends Component {
                      onChange={this.onLabelChange}
                      placeholder='Enter password'/>
             </div>
+
             <div className='confirmPassword'>
               <span> <span className='important'> * </span>Confirm password: </span>
               <input
@@ -154,6 +163,7 @@ class FormComponent extends Component {
                 onChange={this.onLabelChange}
                 placeholder='Enter password'/>
             </div>
+
             <div className='region'>
               <span> <span className='important'> * </span>Region selector:</span>
               <select
@@ -167,6 +177,7 @@ class FormComponent extends Component {
                 <option>444</option>
               </select>
             </div>
+
             <div className='sex'>
               <span> <span className='important'> * </span> Sex: </span>
               <div className='wrapperRadio'>
@@ -182,6 +193,7 @@ class FormComponent extends Component {
                        onChange={this.handleRadio}/>
               </div>
             </div>
+
             <div className='emails'>
               <span>Send me promotional emails:</span>
               <input
@@ -189,6 +201,7 @@ class FormComponent extends Component {
                 type="checkbox"
                 onClick={this.handleCheckbox}/>
             </div>
+
             <div className='info'>
               <span>Additional info:</span>
               <textarea
@@ -196,17 +209,21 @@ class FormComponent extends Component {
                 onChange={this.onLabelChange}
                 className='inputInfo'></textarea>
             </div>
+
             <div className='foto'>
               <span> Upload foto:</span>
               <input type="file" ref={this.fileInput}/>
             </div>
           </label>
+
           <div className='wrapperButton'>
             <input disabled={this.state.disabled} className='button' type="submit" value="Submit"/>
           </div>
+
           <span className='infoUser'>* field is required</span>
         </form>
 
+        {shownModalWindow ? <SimpleSnackbar onSubmit={this.onSubmit}/> : null}
       </div>
     )
   }
