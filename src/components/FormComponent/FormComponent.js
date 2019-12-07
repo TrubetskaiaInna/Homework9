@@ -8,6 +8,7 @@ const initialState = {
   lastName: '',
   userName: '',
   email: '',
+  emailError: '',
   password: '',
   passwordError: '',
   confirmPassword: '',
@@ -31,6 +32,12 @@ class FormComponent extends Component {
     this.fileInput = React.createRef()
   }
 
+  isValidEmail = () => {
+    if (this.state.email.indexOf('@') === -1) {
+      this.setState({ emailError: 'Enter valid email' })
+    } else {this.setState({ emailError: '' })}
+  }
+
   isValidPassword = () => {
     if (this.state.password.length <= 10) {
       this.setState({ passwordError: 'Password must contain at least 10 characters' })
@@ -38,10 +45,9 @@ class FormComponent extends Component {
   }
 
   isValidConfPassword = () => {
-    if (this.state.password !== this.state.confirmPassword){
-      this.setState({ confirmPasswordError: 'Password does not match'})
-    }
-    else (this.setState({ confirmPasswordError: ''}))
+    if (this.state.password !== this.state.confirmPassword) {
+      this.setState({ confirmPasswordError: 'Password does not match' })
+    } else (this.setState({ confirmPasswordError: '' }))
   }
 
   isValidForm = () => {
@@ -59,6 +65,16 @@ class FormComponent extends Component {
     this.setState({
       [name]: e.target.value
     }, () => {
+      this.isValidForm()
+    })
+  }
+
+  onLabelChangeEmail = (e) => {
+    const name = e.target.name
+    this.setState({
+      [name]: e.target.value
+    }, () => {
+      this.isValidEmail()
       this.isValidForm()
     })
   }
@@ -175,8 +191,11 @@ class FormComponent extends Component {
                 name="email"
                 className='inputEmail'
                 type="text"
-                onChange={this.onLabelChange}
+                onChange={this.onLabelChangeEmail}
                 placeholder='Enter email'/>
+              <div className='wrapperError'>
+                <p>{this.state.emailError}</p>
+              </div>
             </div>
 
             <div className='password'>
