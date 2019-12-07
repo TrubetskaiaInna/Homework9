@@ -27,11 +27,22 @@ class FormComponent extends Component {
     this.fileInput = React.createRef()
   }
 
+  isValidForm = () => {
+    if (this.state.firstName && this.state.lastName && this.state.userName && this.state.email
+      && this.state.password && this.state.confirmPassword && this.state.region && (this.state.sex.woman
+        || this.state.sex.man)) {
+      this.setState({ disabled: false })
+    } else {
+      this.setState({ disabled: true })
+    }
+  }
 
   onLabelChange = (e) => {
     const name = e.target.name
     this.setState({
       [name]: e.target.value
+    }, () => {
+      this.isValidForm()
     })
   }
 
@@ -54,6 +65,8 @@ class FormComponent extends Component {
     }
     this.setState({
       sex: { man, woman }
+    }, () => {
+      this.isValidForm()
     })
   }
 
