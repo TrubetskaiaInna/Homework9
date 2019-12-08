@@ -6,7 +6,9 @@ const initialState = {
   firstName: '',
   firstNameError: '',
   lastName: '',
+  lastNameError: '',
   userName: '',
+  userNameError: '',
   email: '',
   emailError: '',
   password: '',
@@ -21,7 +23,8 @@ const initialState = {
   emailPermission: false,
   additionalInfo: '',
   disabled: true,
-  fotoFile: '',
+  photoFile: null,
+  photoFileError: ''
 }
 
 let shownModalWindow = false
@@ -33,28 +36,12 @@ class FormComponent extends Component {
     this.fileInput = React.createRef()
   }
 
-  isValidEmail = () => {
-    if (this.state.email.indexOf('@') === -1) {
-      this.setState({ emailError: 'Enter valid email' })
-    } else {this.setState({ emailError: '' })}
-  }
-
-  isValidPassword = () => {
-    if (this.state.password.length <= 10) {
-      this.setState({ passwordError: 'Password must contain at least 10 characters' })
-    } else {this.setState({ passwordError: '' })}
-  }
-
-  isValidConfPassword = () => {
-    if (this.state.password !== this.state.confirmPassword) {
-      this.setState({ confirmPasswordError: 'Password does not match' })
-    } else (this.setState({ confirmPasswordError: '' }))
-  }
-
   isValidForm = () => {
     if (this.state.firstName && this.state.lastName && this.state.userName && this.state.email
       && this.state.password && this.state.confirmPassword && this.state.region && (this.state.sex.woman
-        || this.state.sex.man) && !this.state.emailError && !this.state.passwordError && !this.state.confirmPasswordError) {
+        || this.state.sex.man) && !this.state.emailError && !this.state.passwordError
+      && !this.state.confirmPasswordError && !this.state.firstNameError && !this.state.lastNameError
+      && !this.state.userNameError && !this.state.photoFileError) {
       this.setState({ disabled: false })
     } else {
       this.setState({ disabled: true })
@@ -70,13 +57,61 @@ class FormComponent extends Component {
     })
   }
 
+  onLabelChangeFirsName = (e) => {
+    const name = e.target.name
+    this.setState({
+      [name]: e.target.value
+    }, () => {
+      let re = new RegExp('^[a-zA-Z0-9]+$')
+      let result = re.test(this.state.firstName)
+      if (!result) {
+        this.setState({ firstNameError: 'first name can only contain numbers and letters' }, this.isValidForm)
+      } else {
+        this.setState({ firstNameError: '' }, this.isValidForm)
+      }
+    })
+  }
+
+  onLabelChangeLastName = (e) => {
+    const name = e.target.name
+    this.setState({
+      [name]: e.target.value
+    }, () => {
+      let re = new RegExp('^[a-zA-Z0-9]+$')
+      let result = re.test(this.state.lastName)
+      if (!result) {
+        this.setState({ lastNameError: 'last name can only contain numbers and letters' }, this.isValidForm)
+      } else {
+        this.setState({ lastNameError: '' }, this.isValidForm)
+      }
+    })
+  }
+
+  onLabelChangeUserName = (e) => {
+    const name = e.target.name
+    this.setState({
+      [name]: e.target.value
+    }, () => {
+      let re = new RegExp('^[a-zA-Z0-9]+$')
+      let result = re.test(this.state.userName)
+      if (!result) {
+        this.setState({ userNameError: 'user name can only contain numbers and letters' }, this.isValidForm)
+      } else {
+        this.setState({ userNameError: '' }, this.isValidForm)
+      }
+    })
+  }
+
   onLabelChangeEmail = (e) => {
     const name = e.target.name
     this.setState({
       [name]: e.target.value
     }, () => {
-      this.isValidEmail()
-      this.isValidForm()
+      if (this.state.email.indexOf('@') === -1) {
+        this.setState({ emailError: 'Enter valid email' }, this.isValidForm)
+      } else {
+        this.setState({ emailError: '' }, this.isValidForm)
+      }
     })
   }
 
@@ -85,8 +120,11 @@ class FormComponent extends Component {
     this.setState({
       [name]: e.target.value
     }, () => {
-      this.isValidForm()
-      this.isValidPassword()
+      if (this.state.password.length <= 9) {
+        this.setState({ passwordError: 'Password must contain at least 10 characters' }, this.isValidForm)
+      } else {
+        this.setState({ passwordError: '' }, this.isValidForm)
+      }
     })
   }
 
@@ -95,8 +133,11 @@ class FormComponent extends Component {
     this.setState({
       [name]: e.target.value
     }, () => {
-      this.isValidForm()
-      this.isValidConfPassword()
+      if (this.state.password !== this.state.confirmPassword) {
+        this.setState({ confirmPasswordError: 'Password does not match' }, this.isValidForm)
+      } else {
+        this.setState({ confirmPasswordError: '' }, this.isValidForm)
+      }
     })
   }
 
@@ -124,10 +165,13 @@ class FormComponent extends Component {
     })
   }
 
-  handleOnFileChange = (event) => {
-    console.log(event.target.files[0])
-    let file = event.target.files[0]
-    this.setState({ fotoFile: file })
+  isValidFile = (e) => {
+    let file = e.target.files[0]
+    if (file && file.type !== ('image/jpeg' || 'image.png')) {
+      this.setState({ photoFileError: 'Incorrect file format selected, choose jpeg or png' }, this.isValidForm)
+    } else {
+      this.setState({ photoFileError: '' }, this.isValidForm)
+    }
   }
 
   onSubmit = (e) => {
@@ -144,10 +188,9 @@ class FormComponent extends Component {
       sex: this.state.sex,
       emailPermission: this.state.emailPermission,
       additionalInfo: this.state.additionalInfo,
-      fotoFile: '',
     }
     if (this.fileInput.current && this.fileInput.current.files[0]) {
-      myData.fotoFile = this.fileInput.current.files[0]
+      myData.photoFile = this.fileInput.current.files[0]
     }
     console.log(myData)
     this.setState(initialState)
@@ -167,10 +210,12 @@ class FormComponent extends Component {
                 name="firstName"
                 className='inputFirstName'
                 type="text"
-                // pattern='^[a-zA-Z]+$'
                 value={this.state.firstName}
-                onChange={this.onLabelChange}
+                onChange={this.onLabelChangeFirsName}
                 placeholder='Enter first name'/>
+              <div className='wrapperError'>
+                <p>{this.state.firstNameError}</p>
+              </div>
             </div>
 
             <div className='lastName'>
@@ -180,8 +225,11 @@ class FormComponent extends Component {
                 className='inputLastName'
                 value={this.state.lastName}
                 type="text"
-                onChange={this.onLabelChange}
+                onChange={this.onLabelChangeLastName}
                 placeholder='Enter last name'/>
+              <div className='wrapperError'>
+                <p>{this.state.lastNameError}</p>
+              </div>
             </div>
 
             <div className='userName'>
@@ -191,8 +239,11 @@ class FormComponent extends Component {
                 className='inputUserName'
                 value={this.state.userName}
                 type="text"
-                onChange={this.onLabelChange}
+                onChange={this.onLabelChangeUserName}
                 placeholder='Enter user name'/>
+              <div className='wrapperError'>
+                <p>{this.state.userNameError}</p>
+              </div>
             </div>
 
             <div className='email'>
@@ -237,7 +288,7 @@ class FormComponent extends Component {
             </div>
 
             <div className='region'>
-              <span> <span className='important'> * </span>Region selector:</span>
+              <span> <span className='important'> * </span>Region:</span>
               <select
                 value={this.state.region}
                 name='region'
@@ -286,9 +337,12 @@ class FormComponent extends Component {
                 className='inputInfo'></textarea>
             </div>
 
-            <div className='foto'>
-              <span> Upload foto:</span>
-              <input onChange={this.handleOnFileChange} type="file" ref={this.fileInput}/>
+            <div className='photo'>
+              <span> Upload photo:</span>
+              <input onChange={this.isValidFile} className='file' type="file" ref={this.fileInput}/>
+              <div className='wrapperError'>
+                <p>{this.state.photoFileError}</p>
+              </div>
             </div>
           </label>
 
