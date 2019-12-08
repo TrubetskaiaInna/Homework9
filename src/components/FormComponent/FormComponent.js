@@ -47,6 +47,15 @@ class FormComponent extends Component {
       this.setState({ disabled: true })
     }
   }
+  
+  isValidPassword = () => {
+      if (this.state.password !== this.state.confirmPassword){
+        this.setState({ confirmPasswordError: 'Password does not match'}, this.isValidForm)
+      }
+      else {
+        this.setState({ confirmPasswordError: ''}, this.isValidForm)
+      }
+    }
 
   onLabelChange = (e) => {
     const name = e.target.name
@@ -121,9 +130,11 @@ class FormComponent extends Component {
       [name]: e.target.value
     }, () => {
       if (this.state.password.length <= 9) {
-        this.setState({ passwordError: 'Password must contain at least 10 characters' }, this.isValidForm)
+        this.setState({ passwordError: 'Password must contain at least 10 characters' },
+          this.isValidPassword )
       } else {
-        this.setState({ passwordError: '' }, this.isValidForm)
+        this.setState({ passwordError: '' },
+          this.isValidPassword)
       }
     })
   }
