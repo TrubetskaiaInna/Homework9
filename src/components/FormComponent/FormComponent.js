@@ -116,7 +116,9 @@ class FormComponent extends Component {
     this.setState({
       [name]: e.target.value
     }, () => {
-      if (this.state.email.indexOf('@') === -1) {
+      let re = new RegExp('^([A-Za-z0-9_\\-.])+@([A-Za-z0-9_\\-.])+\\.([A-Za-z]{2,4})$')
+      let result = re.test(this.state.email)
+      if (!result) {
         this.setState({ emailError: 'Enter valid email' }, this.isValidForm)
       } else {
         this.setState({ emailError: '' }, this.isValidForm)
