@@ -2,46 +2,47 @@ import React, { Component } from 'react'
 import './FormComponent.sass'
 import SimpleSnackbar from '../MessageComponent/MessageComponent'
 
-const initialState = {
-  firstName: '',
-  firstNameError: '',
-  lastName: '',
-  lastNameError: '',
-  userName: '',
-  userNameError: '',
-  email: '',
-  emailError: '',
-  password: '',
-  passwordError: '',
-  confirmPassword: '',
-  confirmPasswordError: '',
-  region: '',
-  sex: {
-    man: false,
-    woman: false
-  },
-  emailPermission: false,
-  additionalInfo: '',
-  disabled: true,
-  photoFile: null,
-  photoFileError: ''
-}
-
-let shownModalWindow = false
-
 class FormComponent extends Component {
   constructor (props) {
     super(props)
-    this.state = initialState
+    this.state = {
+      firstName: '',
+      firstNameError: '',
+      lastName: '',
+      lastNameError: '',
+      userName: '',
+      userNameError: '',
+      email: '',
+      emailError: '',
+      password: '',
+      passwordError: '',
+      confirmPassword: '',
+      confirmPasswordError: '',
+      region: '',
+      sex: {
+        man: false,
+        woman: false
+      },
+      emailPermission: false,
+      additionalInfo: '',
+      disabled: true,
+      photoFile: null,
+      photoFileError: '',
+      shownModalWindow: false
+    }
     this.fileInput = React.createRef()
   }
 
-  isValidForm = () => {
-    if (this.state.firstName && this.state.lastName && this.state.userName && this.state.email
+  allValid = () => {
+    return this.state.firstName && this.state.lastName && this.state.userName && this.state.email
       && this.state.password && this.state.confirmPassword && this.state.region && (this.state.sex.woman
         || this.state.sex.man) && !this.state.emailError && !this.state.passwordError
       && !this.state.confirmPasswordError && !this.state.firstNameError && !this.state.lastNameError
-      && !this.state.userNameError && !this.state.photoFileError) {
+      && !this.state.userNameError && !this.state.photoFileError
+  }
+
+  isValidForm = () => {
+    if (this.allValid()) {
       this.setState({ disabled: false })
     } else {
       this.setState({ disabled: true })
@@ -49,11 +50,10 @@ class FormComponent extends Component {
   }
 
   isValidPassword = () => {
-    if (this.state.password !== this.state.confirmPassword){
-      this.setState({ confirmPasswordError: 'Password does not match'}, this.isValidForm)
-    }
-    else {
-      this.setState({ confirmPasswordError: ''}, this.isValidForm)
+    if (this.state.password !== this.state.confirmPassword) {
+      this.setState({ confirmPasswordError: 'Password does not match' }, this.isValidForm)
+    } else {
+      this.setState({ confirmPasswordError: '' }, this.isValidForm)
     }
   }
 
@@ -133,7 +133,7 @@ class FormComponent extends Component {
     }, () => {
       if (this.state.password.length <= 9) {
         this.setState({ passwordError: 'Password must contain at least 10 characters' },
-          this.isValidPassword )
+          this.isValidPassword)
       } else {
         this.setState({ passwordError: '' },
           this.isValidPassword)
@@ -189,24 +189,59 @@ class FormComponent extends Component {
 
   onSubmit = (e) => {
     e.preventDefault()
-    shownModalWindow = !shownModalWindow
+    const {
+      firstName,
+      lastName,
+      userName,
+      email,
+      password,
+      confirmPassword,
+      region,
+      sex,
+      emailPermission,
+      additionalInfo
+    } = this.state
     let myData = {
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      userName: this.state.userName,
-      email: this.state.email,
-      password: this.state.password,
-      confirmPassword: this.state.confirmPassword,
-      region: this.state.region,
-      sex: this.state.sex,
-      emailPermission: this.state.emailPermission,
-      additionalInfo: this.state.additionalInfo,
+      firstName,
+      lastName,
+      userName,
+      email,
+      password,
+      confirmPassword,
+      region,
+      sex,
+      emailPermission,
+      additionalInfo,
     }
     if (this.fileInput.current && this.fileInput.current.files[0]) {
       myData.photoFile = this.fileInput.current.files[0]
     }
     console.log(myData)
-    this.setState(initialState)
+    this.setState({
+      firstName: '',
+      firstNameError: '',
+      lastName: '',
+      lastNameError: '',
+      userName: '',
+      userNameError: '',
+      email: '',
+      emailError: '',
+      password: '',
+      passwordError: '',
+      confirmPassword: '',
+      confirmPasswordError: '',
+      region: '',
+      sex: {
+        man: false,
+        woman: false
+      },
+      emailPermission: false,
+      additionalInfo: '',
+      disabled: true,
+      photoFile: null,
+      photoFileError: '',
+      shownModalWindow: true
+    })
     this.fileInput.current.value = null
   }
 
@@ -347,7 +382,7 @@ class FormComponent extends Component {
                 value={this.state.additionalInfo}
                 name='additionalInfo'
                 onChange={this.onLabelChange}
-                className='inputInfo'></textarea>
+                className='inputInfo'/>
             </div>
 
             <div className='photo'>
@@ -366,7 +401,7 @@ class FormComponent extends Component {
           <span className='infoUser'>* field is required</span>
         </form>
 
-        {shownModalWindow ? <SimpleSnackbar onSubmit={this.onSubmit}/> : null}
+        {this.state.shownModalWindow ? <SimpleSnackbar/> : null}
       </div>
     )
   }
